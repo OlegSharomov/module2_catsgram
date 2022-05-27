@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import ru.yandex.practicum.catsgram.exception.IncorrectParameterException;
 import ru.yandex.practicum.catsgram.model.FeedParams;
 import ru.yandex.practicum.catsgram.model.Post;
 import ru.yandex.practicum.catsgram.service.PostService;
@@ -23,13 +24,21 @@ public class PostFeedController {
         this.postService = postService;
     }
 
+    // Возвращает последние посты друзей. Принимает тело, в котором поля:
+    // String sort/ Integer size / List<String> friendsEmails;
     @PostMapping
     List<Post> getFriendsFeed(@RequestBody FeedParams feedParams) {
-        if (!SORTS.contains(feedParams.getSort()) || feedParams.getFriendsEmails().isEmpty()) {
-            throw new IllegalArgumentException();
+        if (!SORTS.contains(feedParams.getSort())) {
+            throw new IncorrectParameterException("Отсутствует параметр сортировки. " +
+                    "Корректные параматры: \"desc\" или \"asc\" ", feedParams.getSort());
+        }
+        if (feedParams.getFriendsEmails().isEmpty()) {
+            throw new IncorrectParameterException("В запросе поля друзей пусты. Заполните их email's, пожалуйста.",
+                    feedParams.getFriendsEmails().toString());
         }
         if (feedParams.getSize() == null || feedParams.getSize() <= 0) {
-            throw new IllegalArgumentException();
+            throw new IncorrectParameterException("Не корректно указан параметр размера возвращаемых постов.",
+                    String.valueOf(feedParams.getSize()));
         }
 
         List<Post> result = new ArrayList<>();

@@ -30,4 +30,13 @@ public class FeedParams {
     public List<String> getFriendsEmails() {
         return friendsEmails;
     }
+
+    @Override
+    public String toString() {
+        return "FeedParams{" +
+                "sort='" + sort + '\'' +
+                ", size=" + size +
+                ", friendsEmails=" + friendsEmails +
+                '}';
+    }
 }
